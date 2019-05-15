@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import redis.clients.jedis.JedisPool;
 
-import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
 public class DataServerApplication {

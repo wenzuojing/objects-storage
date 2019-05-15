@@ -8,11 +8,13 @@ public interface StorageService {
 
     void write(InputStream inputStream , String filePath) throws IOException ;
 
-    OutputStream read(String filePath) throws IOException ;
+    InputStream read(String filePath) throws IOException ;
 
     boolean remove(String filePath) throws IOException ;
 
     boolean move(String srcFilePath , String toFilePath ) throws IOException;
+
+    long size(String filePath)  throws IOException ;
 
 
 

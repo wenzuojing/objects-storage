@@ -26,12 +26,12 @@ public class LocalDiskStorageService implements StorageService{
     }
 
     @Override
-    public OutputStream read(String filePath) throws IOException {
+    public InputStream read(String filePath) throws IOException {
         File file = new File(filePath);
         if(!file.exists()){
             return null;
         }
-        return new FileOutputStream(file);
+        return new FileInputStream(file);
     }
 
     @Override
@@ -48,5 +48,14 @@ public class LocalDiskStorageService implements StorageService{
     public boolean move(String srcFilePath, String toFilePath) throws IOException {
         Files.move(Paths.get(srcFilePath) , Paths.get(toFilePath) , StandardCopyOption.REPLACE_EXISTING );
         return true;
+    }
+
+    @Override
+    public long size(String filePath) throws IOException {
+        File file = new File(filePath);
+        if(!file.exists()){
+            return -1l;
+        }
+        return file.length() ;
     }
 }
