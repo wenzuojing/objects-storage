@@ -2,19 +2,26 @@ package org.wens.os.dataserver.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
+/**
+ * @author wens
+ */
 public interface StorageService {
 
-    void write(InputStream inputStream , String filePath) throws IOException ;
+    long write(InputStream inputStream , String key ) throws IOException ;
 
-    InputStream read(String filePath) throws IOException ;
+    long write(InputStream inputStream , String key , boolean gzipCompress ) throws IOException ;
 
-    boolean remove(String filePath) throws IOException ;
+    InputStream read(String key) throws IOException ;
 
-    boolean move(String srcFilePath , String toFilePath ) throws IOException;
+    InputStream read(String key,boolean gzipUncompress) throws IOException ;
 
-    long size(String filePath)  throws IOException ;
+    boolean remove(String key) throws IOException ;
+
+    boolean move(String srcKey , String toKey ) throws IOException;
+
+    long size(String key)  throws IOException ;
+
 
 
 
