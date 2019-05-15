@@ -24,7 +24,6 @@
         </dependency>
 
 
-
         <dependency>
             <groupId>org.wens.os</groupId>
             <artifactId>common</artifactId>

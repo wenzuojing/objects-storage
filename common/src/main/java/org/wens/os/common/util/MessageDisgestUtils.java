@@ -8,7 +8,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public class MessageDisgestUtils {
 
-    public static MessageDigest sha256(){
+    public static MessageDigest sha256() {
         try {
             return MessageDigest.getInstance("sha-256");
         } catch (NoSuchAlgorithmException e) {

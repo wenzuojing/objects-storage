@@ -15,7 +15,6 @@ import java.util.concurrent.CountDownLatch;
 
 /**
  * @author wens
- *
  */
 public class RedisMessageQueue extends BinaryJedisPubSub implements MessageQueue {
 
@@ -37,7 +36,7 @@ public class RedisMessageQueue extends BinaryJedisPubSub implements MessageQueue
 
     @Override
     public void send(byte[] data) {
-        if(!running){
+        if (!running) {
             throw new OSException("The queue is not running");
         }
         try (Jedis jedis = jedisPool.getResource()) {
@@ -47,7 +46,7 @@ public class RedisMessageQueue extends BinaryJedisPubSub implements MessageQueue
 
     @Override
     public void consume(MessageListener messageListener) {
-        if(!running){
+        if (!running) {
             throw new OSException("The queue is not running");
         }
         messageListeners.add(messageListener);
@@ -75,8 +74,8 @@ public class RedisMessageQueue extends BinaryJedisPubSub implements MessageQueue
                         try (Jedis jedis = jedisPool.getResource()) {
                             countDownLatch.countDown();
                             jedis.subscribe(RedisMessageQueue.this, topic);
-                        }catch (Throwable t){
-                            log.error("subscribe message fail.",t );
+                        } catch (Throwable t) {
+                            log.error("subscribe message fail.", t);
                         }
                     }
                 }, String.format("subscribe-%s", new String(topic, Charset.forName("utf-8")))).start();

@@ -2,7 +2,6 @@ package org.wens.os.common.queue;
 
 /**
  * @author wens
- *
  */
 public interface MessageQueue {
 

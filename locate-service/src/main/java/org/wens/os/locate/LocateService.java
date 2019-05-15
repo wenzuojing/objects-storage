@@ -6,5 +6,4 @@ package org.wens.os.locate;
 public interface LocateService {
 
 
-
 }

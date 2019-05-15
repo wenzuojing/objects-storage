@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.stereotype.Component;
 import org.wens.os.common.queue.MessageQueue;
 import org.wens.os.common.queue.RedisMessageQueue;
@@ -20,31 +19,30 @@ public class HeartbeatRunner implements CommandLineRunner {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Resource
-    private JedisPool jedisPool ;
+    private JedisPool jedisPool;
 
     @Value("${server.address}:${server.port}")
-    private String listenAddress ;
-
+    private String listenAddress;
 
 
     @Override
     public void run(String... args) throws Exception {
-        MessageQueue messageQueue = new RedisMessageQueue("dataServer" , jedisPool );
+        MessageQueue messageQueue = new RedisMessageQueue("dataServer", jedisPool);
         messageQueue.start();
-        new Thread(()->{
+        new Thread(() -> {
             AtomicBoolean stopped = new AtomicBoolean(false);
-            Runtime.getRuntime().addShutdownHook(new Thread(()->stopped.set(true)));
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> stopped.set(true)));
 
-            while ( !stopped.get() ){
+            while (!stopped.get()) {
                 try {
-                    Thread.sleep(TimeUnit.SECONDS.toMillis(2));messageQueue.send(listenAddress.getBytes());
-                }catch (Throwable t ){
-                    log.error("send heartbeat fail" , t );
+                    Thread.sleep(TimeUnit.SECONDS.toMillis(2));
+                    messageQueue.send(listenAddress.getBytes());
+                } catch (Throwable t) {
+                    log.error("send heartbeat fail", t);
                 }
             }
 
-        },"heartbeat-thread").start();
-
+        }, "heartbeat-thread").start();
 
 
     }

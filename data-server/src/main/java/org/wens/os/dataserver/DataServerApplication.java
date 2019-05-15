@@ -12,27 +12,27 @@ import redis.clients.jedis.JedisPool;
 public class DataServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DataServerApplication.class,args);
+        SpringApplication.run(DataServerApplication.class, args);
     }
 
 
     @Bean
-    public RedisProperties redisProperties(){
+    public RedisProperties redisProperties() {
         return new RedisProperties();
     }
 
     @Bean
-    public JedisPool jedisPool(RedisProperties redisProperties){
+    public JedisPool jedisPool(RedisProperties redisProperties) {
         GenericObjectPoolConfig config = new GenericObjectPoolConfig();
         RedisProperties.Jedis jedis = redisProperties.getJedis();
-        if(jedis != null ){
+        if (jedis != null) {
             config.setMaxIdle(jedis.getPool().getMaxIdle());
             config.setMaxWaitMillis(jedis.getPool().getMaxWait().toMillis());
             config.setMaxTotal(jedis.getPool().getMaxActive());
             config.setMinIdle(jedis.getPool().getMinIdle());
         }
-        JedisPool jedisPool = new JedisPool(config,redisProperties.getHost(),redisProperties.getPort(),(int)redisProperties.getTimeout().toMillis(),redisProperties.getPassword());
-        return jedisPool ;
+        JedisPool jedisPool = new JedisPool(config, redisProperties.getHost(), redisProperties.getPort(), (int) redisProperties.getTimeout().toMillis(), redisProperties.getPassword());
+        return jedisPool;
     }
 
 }

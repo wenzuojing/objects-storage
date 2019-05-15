@@ -15,9 +15,9 @@ public class RedisMessageQueueTest {
     @Test
     public void test_send_1() throws InterruptedException {
 
-        JedisPool jedisPool = new JedisPool("192.168.15.101",6379);
+        JedisPool jedisPool = new JedisPool("192.168.15.101", 6379);
 
-        MessageQueue messageQueue = new RedisMessageQueue("test" , jedisPool );
+        MessageQueue messageQueue = new RedisMessageQueue("test", jedisPool);
 
         messageQueue.start();
 
@@ -31,28 +31,28 @@ public class RedisMessageQueueTest {
             messages.add(data);
         });
 
-        int n = 0 ;
+        int n = 0;
 
-        for(int i = 0 ; i < n ; i++ ){
-            messageQueue.send(("hi" + i) .getBytes());
+        for (int i = 0; i < n; i++) {
+            messageQueue.send(("hi" + i).getBytes());
         }
 
         Thread.sleep(TimeUnit.SECONDS.toMillis(1));
-        Assert.assertEquals( 2 * n ,messages.size() );
+        Assert.assertEquals(2 * n, messages.size());
 
     }
 
     @Test
     public void test_send_2() throws InterruptedException {
 
-        JedisPool jedisPool = new JedisPool("192.168.15.101",6379);
+        JedisPool jedisPool = new JedisPool("192.168.15.101", 6379);
 
-        MessageQueue messageQueue = new RedisMessageQueue("test" , jedisPool );
+        MessageQueue messageQueue = new RedisMessageQueue("test", jedisPool);
         messageQueue.start();
         List<byte[]> messages = new CopyOnWriteArrayList<>();
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        new Thread(()->{
-            MessageQueue messageQueue2 = new RedisMessageQueue("test" , jedisPool );
+        new Thread(() -> {
+            MessageQueue messageQueue2 = new RedisMessageQueue("test", jedisPool);
             messageQueue2.start();
             messageQueue2.consume(data -> {
                 messages.add(data);
@@ -64,13 +64,13 @@ public class RedisMessageQueueTest {
             messages.add(data);
         });
 
-        int n = 0 ;
-        for(int i = 0 ; i < n ; i++ ){
-            messageQueue.send(("hi" + i) .getBytes());
+        int n = 0;
+        for (int i = 0; i < n; i++) {
+            messageQueue.send(("hi" + i).getBytes());
         }
 
         Thread.sleep(TimeUnit.SECONDS.toMillis(1));
-        Assert.assertEquals( 2 * n ,messages.size() );
+        Assert.assertEquals(2 * n, messages.size());
 
 
     }
@@ -78,8 +78,8 @@ public class RedisMessageQueueTest {
     @Test
     public void test_close() throws InterruptedException {
 
-        JedisPool jedisPool = new JedisPool("192.168.15.101",6379);
-        MessageQueue messageQueue = new RedisMessageQueue("test" , jedisPool );
+        JedisPool jedisPool = new JedisPool("192.168.15.101", 6379);
+        MessageQueue messageQueue = new RedisMessageQueue("test", jedisPool);
         messageQueue.start();
         List<byte[]> messages = new CopyOnWriteArrayList<>();
 
@@ -87,19 +87,19 @@ public class RedisMessageQueueTest {
             messages.add(data);
         });
 
-        int n = 0 ;
-        for(int i = 0 ; i < n ; i++ ){
-            messageQueue.send(("hi" + i) .getBytes());
+        int n = 0;
+        for (int i = 0; i < n; i++) {
+            messageQueue.send(("hi" + i).getBytes());
         }
 
         messageQueue.close();
 
-        for(int i = 0 ; i < n ; i++ ){
-            messageQueue.send(("hi" + i) .getBytes());
+        for (int i = 0; i < n; i++) {
+            messageQueue.send(("hi" + i).getBytes());
         }
 
         Thread.sleep(TimeUnit.SECONDS.toMillis(1));
-        Assert.assertEquals( n ,messages.size() );
+        Assert.assertEquals(n, messages.size());
 
 
     }

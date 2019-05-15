@@ -2,7 +2,6 @@ package org.wens.os.common;
 
 /**
  * @author wens
- *
  */
 public class OSException extends RuntimeException {
 
