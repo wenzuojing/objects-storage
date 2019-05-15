@@ -1,0 +1,4 @@
+org/wens/os/apiserver/controller/ObjectsController.class
+org/wens/os/apiserver/ApiServerApplication.class
+org/wens/os/apiserver/controller/TempController.class
+org/wens/os/apiserver/controller/VersionsController.class

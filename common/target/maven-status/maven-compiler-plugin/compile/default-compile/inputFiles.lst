@@ -1,0 +1,4 @@
+/Users/wens/dev/objects-storage/common/src/main/java/org/wens/os/common/OSException.java
+/Users/wens/dev/objects-storage/common/src/main/java/org/wens/os/common/queue/MessageQueue.java
+/Users/wens/dev/objects-storage/common/src/main/java/org/wens/os/common/queue/MessageListener.java
+/Users/wens/dev/objects-storage/common/src/main/java/org/wens/os/common/queue/RedisMessageQueue.java
