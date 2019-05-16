@@ -33,7 +33,7 @@ public class ActiveDataServerService implements MessageListener {
     public void init() {
         MessageQueue messageQueue = new RedisMessageQueue("dataServer", jedisPool);
         messageQueue.start();
-        messageQueue.consume(this);
+        messageQueue.addMessageListener(this);
         new Thread(() -> {
             while (true) {
                 try {

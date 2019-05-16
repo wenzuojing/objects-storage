@@ -8,8 +8,7 @@ public interface MessageQueue {
 
     void send(byte[] data);
 
-    void consume(MessageListener messageListener);
-
+    void addMessageListener(MessageListener messageListener);
 
     void start();
 

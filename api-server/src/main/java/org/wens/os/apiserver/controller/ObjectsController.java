@@ -1,26 +1,24 @@
 package org.wens.os.apiserver.controller;
 
-import okhttp3.*;
-import okhttp3.RequestBody;
-import okio.BufferedSink;
 import org.apache.commons.io.IOUtils;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import org.wens.os.apiserver.putstream.PutStream;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.wens.os.apiserver.service.ActiveDataServerService;
-import org.wens.os.common.http.OKHttps;
+import org.wens.os.apiserver.stream.GetStream;
+import org.wens.os.apiserver.stream.PutStream;
+import org.wens.os.locate.LocateService;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequestMapping("/objects")
@@ -30,11 +28,20 @@ public class ObjectsController {
     private ActiveDataServerService activeDataServerService;
 
     @Resource
-    private RestTemplate restTemplate ;
+    private LocateService locateService ;
 
     @GetMapping("/{name}")
-    public ResponseEntity get(@PathVariable("name") String name) {
+    public ResponseEntity get(@PathVariable("name") String name , HttpServletResponse response ) throws IOException {
 
+        List<String> servers = locateService.locate(Arrays.asList(name), 1);
+
+        if(servers.size() == 0 ){
+            return ResponseEntity.notFound().build();
+        }
+        try(GetStream getStream = new GetStream(servers.get(0),name)){
+            InputStream inputStream = getStream.read();
+            IOUtils.copy(inputStream,response.getOutputStream());
+        }
         return ResponseEntity.ok(null);
     }
 

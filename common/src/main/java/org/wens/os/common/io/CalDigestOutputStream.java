@@ -1,5 +1,6 @@
 package org.wens.os.common.io;
 
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.MessageDigest;
@@ -45,4 +46,5 @@ public class CalDigestOutputStream extends OutputStream {
         innerOutputStream.write(b);
         messageDigest.update((byte) b);
     }
+
 }

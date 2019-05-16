@@ -6,9 +6,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
+import org.wens.os.locate.LocateService;
+import org.wens.os.locate.LocateServiceImpl;
 import redis.clients.jedis.JedisPool;
 
 @SpringBootApplication
@@ -38,16 +37,8 @@ public class ApiServerApplication {
     }
 
     @Bean
-    public RestTemplate restTemplate(ClientHttpRequestFactory factory) {
-        return new RestTemplate(factory);
-    }
-
-    @Bean
-    public ClientHttpRequestFactory clientHttpRequestFactory() {
-        OkHttp3ClientHttpRequestFactory factory = new OkHttp3ClientHttpRequestFactory();
-        factory.setReadTimeout(5000);
-        factory.setConnectTimeout(5000);
-        return factory;
+    public LocateService locateService(JedisPool jedisPool ){
+        return new LocateServiceImpl("locateMessage" , jedisPool );
     }
 
 }

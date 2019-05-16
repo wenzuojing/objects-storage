@@ -1,10 +1,11 @@
-package org.wens.os.dataserver;
+package org.wens.os.dataserver.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.wens.os.common.queue.MessageQueue;
 import org.wens.os.common.queue.RedisMessageQueue;
 import redis.clients.jedis.JedisPool;
@@ -13,8 +14,11 @@ import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@Component
-public class HeartbeatRunner implements CommandLineRunner {
+/**
+ * @author wens
+ */
+@Service
+public class HeartbeatService implements CommandLineRunner {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 

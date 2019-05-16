@@ -36,19 +36,14 @@ public class RedisMessageQueue extends BinaryJedisPubSub implements MessageQueue
 
     @Override
     public void send(byte[] data) {
-        if (!running) {
-            throw new OSException("The queue is not running");
-        }
+
         try (Jedis jedis = jedisPool.getResource()) {
             jedis.publish(topic, data);
         }
     }
 
     @Override
-    public void consume(MessageListener messageListener) {
-        if (!running) {
-            throw new OSException("The queue is not running");
-        }
+    public void addMessageListener(MessageListener messageListener) {
         messageListeners.add(messageListener);
     }
 

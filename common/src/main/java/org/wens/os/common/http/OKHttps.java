@@ -1,6 +1,9 @@
 package org.wens.os.common.http;
 
-import okhttp3.*;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -10,7 +13,7 @@ import java.time.Duration;
  */
 public class OKHttps {
 
-    private final static OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(Duration.ofSeconds(6)).readTimeout(Duration.ofSeconds(6)).callTimeout(Duration.ofHours(1)).build() ;
+    private final static OkHttpClient okHttpClient = new OkHttpClient.Builder().connectTimeout(Duration.ofSeconds(6)).readTimeout(Duration.ofMinutes(5)).callTimeout(Duration.ofMinutes(5)).build() ;
 
 
     public static Response post(String url, RequestBody requestBody ) throws IOException {

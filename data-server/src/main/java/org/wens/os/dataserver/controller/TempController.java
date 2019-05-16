@@ -1,7 +1,7 @@
 package org.wens.os.dataserver.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
+import java.util.zip.GZIPOutputStream;
 
 @Controller
 @RequestMapping("/temp")
@@ -52,15 +53,17 @@ public class TempController {
 
             //commit
             MessageDigest messageDigest = MessageDisgestUtils.sha256();
-            try (InputStream inputStream2 = storageInstanceService.getTempStorageService().read(uuid);
-                 OutputStream outputStream2 = new CalDigestOutputStream(storageInstanceService.getObjectsStorageService().write(name), messageDigest);
+            try (InputStream inputStream2 = storageInstanceService.getTempStorageService().read(String.format("%s.bat",uuid ));
+                 OutputStream outputStream2 = new GZIPOutputStream( new CalDigestOutputStream( storageInstanceService.getObjectsStorageService().write(name), messageDigest ));
                  OutputStream outputStream3 = storageInstanceService.getObjectsStorageService().write( String.format("%s.checksum",name ))
-
             ) {
                 IOUtils.copy(inputStream2, outputStream2);
-                try (InputStream inputStream3 = IO.textToInputStream("sha256-" + Base64.encodeBase64String(messageDigest.digest()))) {
+                //close buffer
+                outputStream2.close();
+                try (InputStream inputStream3 = IO.textToInputStream("sha256-" + Hex.encodeHexString(messageDigest.digest()))) {
                     IOUtils.copy(inputStream3, outputStream3);
                 }
+
                 storageInstanceService.getTempStorageService().remove(String.format("%s.bat",uuid ));
                 storageInstanceService.getTempStorageService().remove(uuid);
             }
@@ -75,7 +78,7 @@ public class TempController {
         try (OutputStream outputStream = new CalDigestOutputStream(storageInstanceService.getTempStorageService().write(uuid + ".bat"),messageDigest)) {
             long size  = IOUtils.copy(request.getInputStream(), outputStream);
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("checksum", String.format("sha256-%s" , Base64.encodeBase64String( messageDigest.digest() )));
+            jsonObject.put("checksum", String.format("sha256-%s" , Hex.encodeHexString( messageDigest.digest() )));
             jsonObject.put("size", size);
             jsonObject.put("uuid", uuid);
             try (InputStream inputStream1 = new ByteArrayInputStream(jsonObject.toJSONString().getBytes(Charset.forName("utf-8")));

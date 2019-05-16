@@ -1,6 +1,6 @@
 package org.wens.os.dataserver.controller;
 
-import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class ObjectsController {
                  InputStream inputStream3 = storageInstanceService.getObjectsStorageService().read(name + ".checksum")) {
                 IOUtils.copy(inputStream2, response.getOutputStream());
                 String sha256 = IOUtils.toString(inputStream3, Charset.forName("utf-8"));
-                String actualSha256 = Base64.encodeBase64String(messageDigest.digest());
+                String actualSha256 = Hex.encodeHexString(messageDigest.digest());
                 if (sha256.indexOf(actualSha256) == -1) {
                     log.error("checksum mismatch.[ expired = {} , actual = {} ]", sha256, actualSha256);
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

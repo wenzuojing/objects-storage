@@ -23,11 +23,11 @@ public class RedisMessageQueueTest {
 
         List<byte[]> messages = new CopyOnWriteArrayList<>();
 
-        messageQueue.consume(data -> {
+        messageQueue.addMessageListener(data -> {
             messages.add(data);
         });
 
-        messageQueue.consume(data -> {
+        messageQueue.addMessageListener(data -> {
             messages.add(data);
         });
 
@@ -54,13 +54,13 @@ public class RedisMessageQueueTest {
         new Thread(() -> {
             MessageQueue messageQueue2 = new RedisMessageQueue("test", jedisPool);
             messageQueue2.start();
-            messageQueue2.consume(data -> {
+            messageQueue2.addMessageListener(data -> {
                 messages.add(data);
             });
             countDownLatch.countDown();
         }).start();
         countDownLatch.await();
-        messageQueue.consume(data -> {
+        messageQueue.addMessageListener(data -> {
             messages.add(data);
         });
 
@@ -83,7 +83,7 @@ public class RedisMessageQueueTest {
         messageQueue.start();
         List<byte[]> messages = new CopyOnWriteArrayList<>();
 
-        messageQueue.consume(data -> {
+        messageQueue.addMessageListener(data -> {
             messages.add(data);
         });
 

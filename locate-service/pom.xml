@@ -11,4 +11,13 @@
 
     <artifactId>locate-service</artifactId>
     <version>${project.parent.version}</version>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.wens.os</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
 </project>

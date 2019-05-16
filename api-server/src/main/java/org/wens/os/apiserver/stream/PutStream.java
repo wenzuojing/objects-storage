@@ -1,4 +1,4 @@
-package org.wens.os.apiserver.putstream;
+package org.wens.os.apiserver.stream;
 
 import com.alibaba.fastjson.JSONObject;
 import okhttp3.FormBody;
@@ -6,13 +6,14 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.BufferedSink;
-import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.wens.os.common.OSException;
 import org.wens.os.common.http.OKHttps;
 import org.wens.os.common.io.CalDigestInputStream;
 import org.wens.os.common.util.MessageDisgestUtils;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
@@ -20,7 +21,7 @@ import java.security.MessageDigest;
 /**
  * @author wens
  */
-public class PutStream {
+public class PutStream implements Closeable  {
 
     public static class WriteResult {
 
@@ -63,7 +64,7 @@ public class PutStream {
                 throw new IOException("write stream fail.");
             }
             WriteResult result = JSONObject.parseObject(response.body().string(), WriteResult.class);
-            if(result.checksum.indexOf(Base64.encodeBase64String(messageDigest.digest())) == -1 ){
+            if(result.checksum.indexOf(Hex.encodeHexString(messageDigest.digest())) == -1 ){
                 throw  new OSException("checksum mismatch");
             }
             this.writeResult = result ;
@@ -98,5 +99,8 @@ public class PutStream {
         }
     }
 
+    @Override
+    public void close() throws IOException {
 
+    }
 }
