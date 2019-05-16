@@ -28,7 +28,7 @@ public class GetStream implements Closeable {
         if(response.code() == 404 ){
             return null ;
         }
-        if(response.code() == 200 ){
+        if(response.code() != 200 ){
             throw new IOException("read fail");
         }
         closeable = response ;
