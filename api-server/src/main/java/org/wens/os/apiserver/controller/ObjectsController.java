@@ -12,7 +12,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.wens.os.apiserver.putstream.PutStream;
 import org.wens.os.apiserver.service.ActiveDataServerService;
+import org.wens.os.common.http.OKHttps;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -42,31 +44,11 @@ public class ObjectsController {
         List<String> allActiveDataServers = activeDataServerService.getAllActiveDataServers();
         String dataServerAddress = allActiveDataServers.get(0);
 
-        OkHttpClient okHttpClient = new OkHttpClient().newBuilder().callTimeout(6, TimeUnit.SECONDS).connectTimeout(1, TimeUnit.SECONDS).build();
-
-
-        Request requestOfPost = new Request.Builder().url(String.format("http://%s/temp", dataServerAddress)).post(new FormBody.Builder().add("name" ,name).add("size" , "11").build()).build();
-
-        String uuid = okHttpClient.newCall(requestOfPost).execute().body().string();
-
-
-
-        Request requestOfPatch = new Request.Builder().url(String.format("http://%s/temp/%s" , dataServerAddress , uuid )).patch(new RequestBody() {
-            @Override
-            public MediaType contentType() {
-                return MediaType.get("application/octet-stream");
-            }
-
-            @Override
-            public void writeTo(BufferedSink bufferedSink) throws IOException {
-                IOUtils.copy(request.getInputStream() , bufferedSink.outputStream());
-            }
-        }).build();
-
-        int code = okHttpClient.newCall(requestOfPatch).execute().code();
-
-        System.out.println(code);
-
+        PutStream putStream = new PutStream(dataServerAddress);
+        PutStream.WriteResult writeResult = putStream.write(request.getInputStream());
+        if( !putStream.commit(writeResult.checksum.split("-")[1]) ){
+            putStream.delete();
+        }
 
         return ResponseEntity.ok(null);
     }

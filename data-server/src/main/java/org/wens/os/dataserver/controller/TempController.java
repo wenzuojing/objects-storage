@@ -36,7 +36,7 @@ public class TempController {
 
 
     @PutMapping("/{uuid}")
-    public ResponseEntity put(@PathVariable("uuid") String uuid) throws IOException {
+    public ResponseEntity put(@PathVariable("uuid") String uuid , @RequestParam("name") String name) throws IOException {
         try (InputStream inputStream = storageInstanceService.getTempStorageService().read(uuid)) {
             if (inputStream == null) {
                 log.warn("Can not read inputStream. [ uuid = {} ]", uuid);
@@ -44,7 +44,7 @@ public class TempController {
             }
 
             JSONObject jsonObject = JSONObject.parseObject(IOUtils.toString(inputStream, Charset.forName("utf-8")));
-            long actualSize = storageInstanceService.getTempStorageService().size(uuid + ".bat");
+            long actualSize = storageInstanceService.getTempStorageService().size( String.format("%s.bat",uuid ) );
             if (jsonObject.getLong("size") != actualSize) {
                 log.warn("Size mismatch.[size = {} , actualSize = {} , uuid = {} ]", jsonObject.getLong("size"), actualSize, uuid);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -53,40 +53,39 @@ public class TempController {
             //commit
             MessageDigest messageDigest = MessageDisgestUtils.sha256();
             try (InputStream inputStream2 = storageInstanceService.getTempStorageService().read(uuid);
-                 OutputStream outputStream2 = new CalDigestOutputStream(storageInstanceService.getObjectsStorageService().write(jsonObject.getString("name")), messageDigest);
-                 OutputStream outputStream3 = storageInstanceService.getObjectsStorageService().write(jsonObject.getString("name") + ".checksum")
+                 OutputStream outputStream2 = new CalDigestOutputStream(storageInstanceService.getObjectsStorageService().write(name), messageDigest);
+                 OutputStream outputStream3 = storageInstanceService.getObjectsStorageService().write( String.format("%s.checksum",name ))
 
             ) {
                 IOUtils.copy(inputStream2, outputStream2);
                 try (InputStream inputStream3 = IO.textToInputStream("sha256-" + Base64.encodeBase64String(messageDigest.digest()))) {
                     IOUtils.copy(inputStream3, outputStream3);
                 }
+                storageInstanceService.getTempStorageService().remove(String.format("%s.bat",uuid ));
+                storageInstanceService.getTempStorageService().remove(uuid);
             }
         }
         return ResponseEntity.ok().build();
     }
 
     @PostMapping()
-    public ResponseEntity post(@RequestParam("name") String name, @RequestParam("size") String size) throws IOException {
+    public ResponseEntity post( HttpServletRequest request ) throws IOException {
         String uuid = UUIDS.uuid();
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", name);
-        jsonObject.put("size", size);
-        jsonObject.put("uuid", uuid);
-        try (InputStream inputStream = new ByteArrayInputStream(jsonObject.toJSONString().getBytes(Charset.forName("utf-8")));
-             OutputStream outputStream = storageInstanceService.getTempStorageService().write(uuid)) {
-            IOUtils.copy(inputStream, outputStream);
+        MessageDigest messageDigest = MessageDisgestUtils.sha256();
+        try (OutputStream outputStream = new CalDigestOutputStream(storageInstanceService.getTempStorageService().write(uuid + ".bat"),messageDigest)) {
+            long size  = IOUtils.copy(request.getInputStream(), outputStream);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("checksum", String.format("sha256-%s" , Base64.encodeBase64String( messageDigest.digest() )));
+            jsonObject.put("size", size);
+            jsonObject.put("uuid", uuid);
+            try (InputStream inputStream1 = new ByteArrayInputStream(jsonObject.toJSONString().getBytes(Charset.forName("utf-8")));
+                 OutputStream outputStream1 = storageInstanceService.getTempStorageService().write(uuid)) {
+                IOUtils.copy(inputStream1, outputStream1);
+            }
+            return ResponseEntity.ok(jsonObject);
         }
-        return ResponseEntity.ok(uuid);
     }
 
-    @PatchMapping(value = "/{uuid}")
-    public ResponseEntity patch(@PathVariable("uuid") String uuid, HttpServletRequest request) throws IOException {
-        try (OutputStream outputStream = storageInstanceService.getTempStorageService().write(uuid + ".bat")) {
-            IOUtils.copy(request.getInputStream(), outputStream);
-        }
-        return ResponseEntity.ok().build();
-    }
 
     @DeleteMapping("/{uuid}")
     public ResponseEntity delete(@PathVariable("uuid") String uuid) throws IOException {

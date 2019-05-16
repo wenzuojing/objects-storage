@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.wens.os.common.util.UUIDS;
 
-import javax.annotation.Resource;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,7 +19,6 @@ import java.nio.file.Paths;
 @SpringBootTest
 public class LocalDiskStorageServiceTest {
 
-    @Resource
     private LocalDiskStorageService localDiskStorageService ;
 
     private String dir = UUIDS.uuid();
