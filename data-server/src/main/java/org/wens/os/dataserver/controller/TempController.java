@@ -67,7 +67,7 @@ public class TempController {
     }
 
     @PostMapping()
-    public ResponseEntity post(String name, String size) throws IOException {
+    public ResponseEntity post(@RequestParam("name") String name, @RequestParam("size") String size) throws IOException {
         String uuid = UUIDS.uuid();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("name", name);
