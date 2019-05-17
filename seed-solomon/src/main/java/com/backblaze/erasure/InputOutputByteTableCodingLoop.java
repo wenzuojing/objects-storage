@@ -1,6 +1,6 @@
 /**
  * One specific ordering/nesting of the coding loops.
- *
+ * <p>
  * Copyright 2015, Backblaze, Inc.  All rights reserved.
  */
 
@@ -15,7 +15,7 @@ public class InputOutputByteTableCodingLoop extends CodingLoopBase {
             byte[][] outputs, int outputCount,
             int offset, int byteCount) {
 
-        final byte [] [] table = Galois.MULTIPLICATION_TABLE;
+        final byte[][] table = Galois.MULTIPLICATION_TABLE;
 
         {
             final int iInput = 0;
@@ -59,21 +59,21 @@ public class InputOutputByteTableCodingLoop extends CodingLoopBase {
         // Using the loops from this class would require multiple temp
         // buffers.
 
-        final byte [] [] table = Galois.MULTIPLICATION_TABLE;
+        final byte[][] table = Galois.MULTIPLICATION_TABLE;
         for (int iOutput = 0; iOutput < checkCount; iOutput++) {
-            final byte [] outputShard = toCheck[iOutput];
+            final byte[] outputShard = toCheck[iOutput];
             final byte[] matrixRow = matrixRows[iOutput];
             {
                 final int iInput = 0;
-                final byte [] inputShard = inputs[iInput];
-                final byte [] multTableRow = table[matrixRow[iInput] & 0xFF];
+                final byte[] inputShard = inputs[iInput];
+                final byte[] multTableRow = table[matrixRow[iInput] & 0xFF];
                 for (int iByte = offset; iByte < offset + byteCount; iByte++) {
                     tempBuffer[iByte] = multTableRow[inputShard[iByte] & 0xFF];
                 }
             }
             for (int iInput = 1; iInput < inputCount; iInput++) {
-                final byte [] inputShard = inputs[iInput];
-                final byte [] multTableRow = table[matrixRow[iInput] & 0xFF];
+                final byte[] inputShard = inputs[iInput];
+                final byte[] multTableRow = table[matrixRow[iInput] & 0xFF];
                 for (int iByte = offset; iByte < offset + byteCount; iByte++) {
                     tempBuffer[iByte] ^= multTableRow[inputShard[iByte] & 0xFF];
                 }

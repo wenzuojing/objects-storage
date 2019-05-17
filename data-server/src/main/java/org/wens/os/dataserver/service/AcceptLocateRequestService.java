@@ -6,9 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
-import org.wens.os.common.queue.MessageQueue;
-import org.wens.os.common.queue.RedisMessageQueue;
-import redis.clients.jedis.JedisPool;
+import org.wens.os.common.jgroups.JGroupsMessageQueue;
 
 import javax.annotation.Resource;
 import java.nio.charset.Charset;
@@ -24,59 +22,48 @@ public class AcceptLocateRequestService implements CommandLineRunner {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Resource
-    private JedisPool jedisPool;
-
-    @Resource
-    private StorageInstanceService storageInstanceService ;
+    private StorageInstanceService storageInstanceService;
 
     @Value("${server.address}:${server.port}")
     private String listenAddress;
 
-    private ConcurrentHashMap<String,Long> nameMap = new ConcurrentHashMap<>() ;
+    private ConcurrentHashMap<String, Long> nameMap = new ConcurrentHashMap<>();
 
     @Override
     public void run(String... args) throws Exception {
 
-        new Thread(()->{
-            try{
+        new Thread(() -> {
+            try {
                 List<StorageService.Key> keys = storageInstanceService.getObjectsStorageService().list(key -> !key.key.endsWith(".checksum"));
                 Long l = System.currentTimeMillis();
-                keys.forEach( k -> nameMap.put(k.key,l));
-            }catch (Throwable t){
-                log.error("load key fail.",t );
+                keys.forEach(k -> nameMap.put(k.key, l));
+            } catch (Throwable t) {
+                log.error("load key fail.", t);
                 Runtime.getRuntime().exit(-1);
             }
 
+            JGroupsMessageQueue jGroupsMessageQueue = new JGroupsMessageQueue("locateMessage");
+            jGroupsMessageQueue.addMessageListener(context -> {
+                List<String> names = JSONObject.parseArray(new String(context.getMessage(), Charset.forName("utf-8"))).toJavaList(String.class);
 
-            MessageQueue messageQueue = new RedisMessageQueue("locateMessage" , jedisPool );
-            messageQueue.start();
-
-            messageQueue.addMessageListener(m -> {
-                JSONObject jsonObject = JSONObject.parseObject(new String(m, Charset.forName("utf-8")));
-                MessageQueue tempMessageQueue = null ;
-                for(String name : jsonObject.getJSONArray("names").toJavaList(String.class) ){
-                    if(nameMap.containsKey(name)){
-                        if(tempMessageQueue == null ){
-                            tempMessageQueue = new RedisMessageQueue(jsonObject.getString("replyTo"), jedisPool) ;
-                        }
-                        tempMessageQueue.send( (name + ","+ listenAddress).getBytes(Charset.forName("utf-8")));
+                for (String name : names) {
+                    if (nameMap.containsKey(name)) {
+                        context.reply((name + "," + listenAddress).getBytes(Charset.forName("utf-8")));
                     }
                 }
-                if( tempMessageQueue != null ){
-                    tempMessageQueue.close();
-                }
+
             });
 
 
-        },"accept-locate-request-thread").start();
+        }, "accept-locate-request-thread").start();
 
     }
 
-    public void addName(String name ){
-        nameMap.put(name,System.currentTimeMillis());
+    public void addName(String name) {
+        nameMap.put(name, System.currentTimeMillis());
     }
 
-    public void removeName(String name){
+    public void removeName(String name) {
         nameMap.remove(name);
     }
 }

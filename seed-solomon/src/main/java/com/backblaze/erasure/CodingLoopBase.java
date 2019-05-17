@@ -1,6 +1,6 @@
 /**
  * Common implementations for coding loops.
- *
+ * <p>
  * Copyright 2015, Backblaze, Inc.  All rights reserved.
  */
 
@@ -24,10 +24,10 @@ public abstract class CodingLoopBase implements CodingLoop {
 
         // This is the loop structure for ByteOutputInput, which does not
         // require temporary buffers for checking.
-        byte [] [] table = Galois.MULTIPLICATION_TABLE;
+        byte[][] table = Galois.MULTIPLICATION_TABLE;
         for (int iByte = offset; iByte < offset + byteCount; iByte++) {
             for (int iOutput = 0; iOutput < checkCount; iOutput++) {
-                byte [] matrixRow = matrixRows[iOutput];
+                byte[] matrixRow = matrixRows[iOutput];
                 int value = 0;
                 for (int iInput = 0; iInput < inputCount; iInput++) {
                     value ^= table[matrixRow[iInput] & 0xFF][inputs[iInput][iByte] & 0xFF];

@@ -30,14 +30,14 @@ public class RSGetStream implements Closeable {
 
     private InputStream inputStream;
 
-    private String name ;
+    private String name;
 
-    private LocateService locateService ;
+    private LocateService locateService;
 
     public RSGetStream(String name, LocateService locateService) throws IOException {
 
-        this.name = name ;
-        this.locateService = locateService ;
+        this.name = name;
+        this.locateService = locateService;
         this.getStreams = new GetStream[DATA_SHARDS + PARITY_SHARDS];
         this.init();
     }
@@ -81,7 +81,7 @@ public class RSGetStream implements Closeable {
                                 break;
                             }
                             shards[i] = new byte[ByteBuffer.wrap(intBytes).getInt()];
-                            getStreams[i].read(shards[i],0,shards[i].length);
+                            getStreams[i].read(shards[i], 0, shards[i].length);
                         }
                     }
 

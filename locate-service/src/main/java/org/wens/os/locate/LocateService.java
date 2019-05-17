@@ -8,7 +8,7 @@ import java.util.Map;
  */
 public interface LocateService {
 
-    Map<String,String> locate(List<String> names, int expireSize ) ;
+    Map<String, String> locate(List<String> names, int expireSize);
 
 
 }

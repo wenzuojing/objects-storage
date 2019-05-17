@@ -1,7 +1,6 @@
 package org.wens.os.apiserver.stream;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wens.os.apiserver.util.ReedSolomonUtils;
@@ -16,7 +15,7 @@ import java.security.MessageDigest;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.wens.os.apiserver.stream.RSConfig.* ;
+import static org.wens.os.apiserver.stream.RSConfig.*;
 
 /**
  * @author wens
@@ -35,7 +34,6 @@ public class RSPutStream {
             this.size = size;
         }
     }
-
 
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -76,7 +74,7 @@ public class RSPutStream {
             for (int i = 0; i < DATA_SHARDS + PARITY_SHARDS; i++) {
                 byte[] intBytes = new byte[4];
                 ByteBuffer.wrap(intBytes).putInt(shards[i].length);
-                putStreams.get(i).write(intBytes,0,intBytes.length);
+                putStreams.get(i).write(intBytes, 0, intBytes.length);
                 putStreams.get(i).write(shards[i], 0, shards[i].length);
             }
         }
@@ -94,7 +92,7 @@ public class RSPutStream {
         for (int i = 0; i < putStreams.size(); i++) {
             boolean b = putStreams.get(i).commit(String.format("%s.%s", name, i));
             if (!b) {
-                log.warn("commit fail. shard index is {}",i );
+                log.warn("commit fail. shard index is {}", i);
                 allSuccess = false;
                 break;
             }
@@ -111,7 +109,7 @@ public class RSPutStream {
         for (int i = 0; i < putStreams.size(); i++) {
             boolean b = putStreams.get(i).rollback();
             if (!b) {
-                log.warn("rollback fail. shard index is {}",i );
+                log.warn("rollback fail. shard index is {}", i);
                 allSuccess = false;
             }
         }

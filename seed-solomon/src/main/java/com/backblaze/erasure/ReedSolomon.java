@@ -1,6 +1,6 @@
 /**
  * Reed-Solomon Coding over 8-bit values.
- *
+ * <p>
  * Copyright 2015, Backblaze, Inc.
  */
 
@@ -21,7 +21,7 @@ public class ReedSolomon {
      * Rows from the matrix for encoding parity, each one as its own
      * byte array to allow for efficient access while encoding.
      */
-    private final byte [] [] parityRows;
+    private final byte[][] parityRows;
 
     /**
      * Creates a ReedSolomon codec with the default coding loop.
@@ -49,7 +49,7 @@ public class ReedSolomon {
         this.codingLoop = codingLoop;
         this.totalShardCount = dataShardCount + parityShardCount;
         matrix = buildMatrix(dataShardCount, this.totalShardCount);
-        parityRows = new byte [parityShardCount] [];
+        parityRows = new byte[parityShardCount][];
         for (int i = 0; i < parityShardCount; i++) {
             parityRows[i] = matrix.getRow(dataShardCount + i);
         }
@@ -91,7 +91,7 @@ public class ReedSolomon {
         checkBuffersAndSizes(shards, offset, byteCount);
 
         // Build the array of output buffers.
-        byte [] [] outputs = new byte [parityShardCount] [];
+        byte[][] outputs = new byte[parityShardCount][];
         System.arraycopy(shards, dataShardCount, outputs, 0, parityShardCount);
 
         // Do the coding.
@@ -116,7 +116,7 @@ public class ReedSolomon {
         checkBuffersAndSizes(shards, firstByte, byteCount);
 
         // Build the array of buffers being checked.
-        byte [] [] toCheck = new byte [parityShardCount] [];
+        byte[][] toCheck = new byte[parityShardCount][];
         System.arraycopy(shards, dataShardCount, toCheck, 0, parityShardCount);
 
         // Do the checking.
@@ -142,7 +142,7 @@ public class ReedSolomon {
      * @param tempBuffer A temporary buffer (the same size as each of the
      *                   shards) to use when computing parity.
      */
-    public boolean isParityCorrect(byte[][] shards, int firstByte, int byteCount, byte [] tempBuffer) {
+    public boolean isParityCorrect(byte[][] shards, int firstByte, int byteCount, byte[] tempBuffer) {
         // Check arguments.
         checkBuffersAndSizes(shards, firstByte, byteCount);
         if (tempBuffer.length < firstByte + byteCount) {
@@ -150,7 +150,7 @@ public class ReedSolomon {
         }
 
         // Build the array of buffers being checked.
-        byte [] [] toCheck = new byte [parityShardCount] [];
+        byte[][] toCheck = new byte[parityShardCount][];
         System.arraycopy(shards, dataShardCount, toCheck, 0, parityShardCount);
 
         // Do the checking.
@@ -171,8 +171,8 @@ public class ReedSolomon {
      * If any shards are missing (based on the flags in shardsPresent),
      * the data in those shards is recomputed and filled in.
      */
-    public void decodeMissing(byte [] [] shards,
-                              boolean [] shardPresent,
+    public void decodeMissing(byte[][] shards,
+                              boolean[] shardPresent,
                               final int offset,
                               final int byteCount) {
         // Check arguments.
@@ -207,7 +207,7 @@ public class ReedSolomon {
         // will be the input to the decoding process that re-creates
         // the missing data shards.
         Matrix subMatrix = new Matrix(dataShardCount, dataShardCount);
-        byte [] [] subShards = new byte [dataShardCount] [];
+        byte[][] subShards = new byte[dataShardCount][];
         {
             int subMatrixRow = 0;
             for (int matrixRow = 0; matrixRow < totalShardCount && subMatrixRow < dataShardCount; matrixRow++) {
@@ -233,8 +233,8 @@ public class ReedSolomon {
         // The input to the coding is all of the shards we actually
         // have, and the output is the missing data shards.  The computation
         // is done using the special decode matrix we just built.
-        byte [] [] outputs = new byte [parityShardCount] [];
-        byte [] [] matrixRows = new byte [parityShardCount] [];
+        byte[][] outputs = new byte[parityShardCount][];
+        byte[][] matrixRows = new byte[parityShardCount][];
         int outputCount = 0;
         for (int iShard = 0; iShard < dataShardCount; iShard++) {
             if (!shardPresent[iShard]) {
@@ -273,7 +273,7 @@ public class ReedSolomon {
     /**
      * Checks the consistency of arguments passed to public methods.
      */
-    private void checkBuffersAndSizes(byte [] [] shards, int offset, int byteCount) {
+    private void checkBuffersAndSizes(byte[][] shards, int offset, int byteCount) {
         // The number of buffers should be equal to the number of
         // data shards plus the number of parity shards.
         if (shards.length != totalShardCount) {

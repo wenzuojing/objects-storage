@@ -4,13 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.wens.os.common.OSException;
-import org.wens.os.common.queue.MessageListener;
-import org.wens.os.common.queue.MessageQueue;
-import org.wens.os.common.queue.RedisMessageQueue;
-import redis.clients.jedis.JedisPool;
+import org.wens.os.common.jgroups.JGroupsMessageQueue;
+import org.wens.os.common.jgroups.MessageContext;
+import org.wens.os.common.jgroups.MessageListener;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -23,16 +21,13 @@ public class ActiveDataServerService implements MessageListener {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @Resource
-    private JedisPool jedisPool;
 
     private ConcurrentHashMap<String, Long> dataServers = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
-        MessageQueue messageQueue = new RedisMessageQueue("dataServer", jedisPool);
-        messageQueue.start();
-        messageQueue.addMessageListener(this);
+        JGroupsMessageQueue groupsMessageQueue = new JGroupsMessageQueue("dataServer");
+        groupsMessageQueue.addMessageListener(this);
         new Thread(() -> {
             while (true) {
                 try {
@@ -65,8 +60,8 @@ public class ActiveDataServerService implements MessageListener {
     }
 
     @Override
-    public void onMessage(byte[] data) {
-        dataServers.put(new String(data), System.currentTimeMillis());
+    public void onMessage(MessageContext context) {
+        dataServers.put(new String(context.getMessage()), System.currentTimeMillis());
     }
 
     public List<String> getAllActiveDataServers() {
@@ -79,13 +74,13 @@ public class ActiveDataServerService implements MessageListener {
 
     public List<String> random(int i) {
         List<String> servers = getAllActiveDataServers();
-        if(servers.size() < i ){
+        if (servers.size() < i) {
             throw new OSException("There is not enough server");
         }
         Random random = new Random(System.currentTimeMillis());
         Set<Integer> indexS = new HashSet<>();
-        while (indexS.size() != i ){
-            indexS.add( random.nextInt(servers.size()) );
+        while (indexS.size() != i) {
+            indexS.add(random.nextInt(servers.size()));
         }
         List<String> ret = new ArrayList<>(i);
         indexS.forEach(index -> ret.add(servers.get(index)));

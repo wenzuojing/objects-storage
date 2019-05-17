@@ -19,7 +19,7 @@ import java.nio.file.Paths;
 @SpringBootTest
 public class LocalDiskStorageServiceTest {
 
-    private LocalDiskStorageService localDiskStorageService ;
+    private LocalDiskStorageService localDiskStorageService;
 
     private String dir = UUIDS.uuid();
 
@@ -48,7 +48,7 @@ public class LocalDiskStorageServiceTest {
         String filePath = Paths.get(root.toString(), UUIDS.uuid()).toString();
 
         OutputStream outputStream = localDiskStorageService.write(filePath);
-        IOUtils.copy(inputStream,outputStream);
+        IOUtils.copy(inputStream, outputStream);
         InputStream inputStream1 = localDiskStorageService.read(filePath);
         String content1 = IOUtils.toString(inputStream1);
         Assert.assertEquals(content, content1);

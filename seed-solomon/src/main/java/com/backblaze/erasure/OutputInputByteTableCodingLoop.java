@@ -1,6 +1,6 @@
 /**
  * One specific ordering/nesting of the coding loops.
- *
+ * <p>
  * Copyright 2015, Backblaze, Inc.  All rights reserved.
  */
 
@@ -15,21 +15,21 @@ public class OutputInputByteTableCodingLoop extends CodingLoopBase {
             byte[][] outputs, int outputCount,
             int offset, int byteCount) {
 
-        final byte [] [] table = Galois.MULTIPLICATION_TABLE;
+        final byte[][] table = Galois.MULTIPLICATION_TABLE;
         for (int iOutput = 0; iOutput < outputCount; iOutput++) {
-            final byte [] outputShard = outputs[iOutput];
+            final byte[] outputShard = outputs[iOutput];
             final byte[] matrixRow = matrixRows[iOutput];
             {
                 final int iInput = 0;
-                final byte [] inputShard = inputs[iInput];
-                final byte [] multTableRow = table[matrixRow[iInput] & 0xFF];
+                final byte[] inputShard = inputs[iInput];
+                final byte[] multTableRow = table[matrixRow[iInput] & 0xFF];
                 for (int iByte = offset; iByte < offset + byteCount; iByte++) {
                     outputShard[iByte] = multTableRow[inputShard[iByte] & 0xFF];
                 }
             }
             for (int iInput = 1; iInput < inputCount; iInput++) {
-                final byte [] inputShard = inputs[iInput];
-                final byte [] multTableRow = table[matrixRow[iInput] & 0xFF];
+                final byte[] inputShard = inputs[iInput];
+                final byte[] multTableRow = table[matrixRow[iInput] & 0xFF];
                 for (int iByte = offset; iByte < offset + byteCount; iByte++) {
                     outputShard[iByte] ^= multTableRow[inputShard[iByte] & 0xFF];
                 }
@@ -49,21 +49,21 @@ public class OutputInputByteTableCodingLoop extends CodingLoopBase {
             return super.checkSomeShards(matrixRows, inputs, inputCount, toCheck, checkCount, offset, byteCount, null);
         }
 
-        final byte [] [] table = Galois.MULTIPLICATION_TABLE;
+        final byte[][] table = Galois.MULTIPLICATION_TABLE;
         for (int iOutput = 0; iOutput < checkCount; iOutput++) {
-            final byte [] outputShard = toCheck[iOutput];
+            final byte[] outputShard = toCheck[iOutput];
             final byte[] matrixRow = matrixRows[iOutput];
             {
                 final int iInput = 0;
-                final byte [] inputShard = inputs[iInput];
-                final byte [] multTableRow = table[matrixRow[iInput] & 0xFF];
+                final byte[] inputShard = inputs[iInput];
+                final byte[] multTableRow = table[matrixRow[iInput] & 0xFF];
                 for (int iByte = offset; iByte < offset + byteCount; iByte++) {
                     tempBuffer[iByte] = multTableRow[inputShard[iByte] & 0xFF];
                 }
             }
             for (int iInput = 1; iInput < inputCount; iInput++) {
-                final byte [] inputShard = inputs[iInput];
-                final byte [] multTableRow = table[matrixRow[iInput] & 0xFF];
+                final byte[] inputShard = inputs[iInput];
+                final byte[] multTableRow = table[matrixRow[iInput] & 0xFF];
                 for (int iByte = offset; iByte < offset + byteCount; iByte++) {
                     tempBuffer[iByte] ^= multTableRow[inputShard[iByte] & 0xFF];
                 }

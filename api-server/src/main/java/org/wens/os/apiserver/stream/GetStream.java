@@ -12,25 +12,25 @@ import java.io.IOException;
  */
 public class GetStream implements Closeable {
 
-    private Response response ;
+    private Response response;
 
-    public GetStream(String server , String name ) throws IOException {
+    public GetStream(String server, String name) throws IOException {
         response = OKHttps.get(String.format("http://%s/objects/%s", server, name));
-        if(response.code() == 404 ){
+        if (response.code() == 404) {
             throw new OSNotFoundException("can not find stream");
         }
-        if(response.code() != 200 ){
+        if (response.code() != 200) {
             throw new IOException("read fail");
         }
     }
 
-    public int read(byte[] b ,int off , int len) throws IOException {
-        return response.body().byteStream().read(b,off,len);
+    public int read(byte[] b, int off, int len) throws IOException {
+        return response.body().byteStream().read(b, off, len);
     }
 
     @Override
     public void close() throws IOException {
-        if(response != null ){
+        if (response != null) {
             response.close();
         }
     }

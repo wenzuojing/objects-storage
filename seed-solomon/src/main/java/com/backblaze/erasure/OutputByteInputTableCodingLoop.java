@@ -1,6 +1,6 @@
 /**
  * One specific ordering/nesting of the coding loops.
- *
+ * <p>
  * Copyright 2015, Backblaze, Inc.  All rights reserved.
  */
 
@@ -15,7 +15,7 @@ public class OutputByteInputTableCodingLoop extends CodingLoopBase {
             byte[][] outputs, int outputCount,
             int offset, int byteCount) {
 
-        final byte [] [] table = Galois.MULTIPLICATION_TABLE;
+        final byte[][] table = Galois.MULTIPLICATION_TABLE;
         for (int iOutput = 0; iOutput < outputCount; iOutput++) {
             final byte[] outputShard = outputs[iOutput];
             final byte[] matrixRow = matrixRows[iOutput];

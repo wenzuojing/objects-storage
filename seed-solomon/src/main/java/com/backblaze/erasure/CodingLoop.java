@@ -1,6 +1,6 @@
 /**
  * Interface for a method of looping over inputs and encoding them.
- *
+ * <p>
  * Copyright 2015, Backblaze, Inc.  All rights reserved.
  */
 
@@ -40,7 +40,7 @@ public interface CodingLoop {
      * methods, so it's probably already doing so.
      */
     CodingLoop[] ALL_CODING_LOOPS =
-            new CodingLoop[] {
+            new CodingLoop[]{
                     new ByteInputOutputExpCodingLoop(),
                     new ByteInputOutputTableCodingLoop(),
                     new ByteOutputInputExpCodingLoop(),
@@ -76,13 +76,13 @@ public interface CodingLoop {
      *               to process.
      * @param byteCount The number of bytes to process.
      */
-     void codeSomeShards(final byte[][] matrixRows,
-                         final byte[][] inputs,
-                         final int inputCount,
-                         final byte[][] outputs,
-                         final int outputCount,
-                         final int offset,
-                         final int byteCount);
+    void codeSomeShards(final byte[][] matrixRows,
+                        final byte[][] inputs,
+                        final int inputCount,
+                        final byte[][] outputs,
+                        final int outputCount,
+                        final int offset,
+                        final int byteCount);
 
     /**
      * Multiplies a subset of rows from a coding matrix by a full set of
@@ -107,12 +107,12 @@ public interface CodingLoop {
      * @param byteCount The number of bytes to process.
      * @param tempBuffer A place to store temporary results.  May be null.
      */
-     boolean checkSomeShards(final byte[][] matrixRows,
-                             final byte[][] inputs,
-                             final int inputCount,
-                             final byte[][] toCheck,
-                             final int checkCount,
-                             final int offset,
-                             final int byteCount,
-                             final byte[] tempBuffer);
+    boolean checkSomeShards(final byte[][] matrixRows,
+                            final byte[][] inputs,
+                            final int inputCount,
+                            final byte[][] toCheck,
+                            final int checkCount,
+                            final int offset,
+                            final int byteCount,
+                            final byte[] tempBuffer);
 }

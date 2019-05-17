@@ -1,6 +1,6 @@
 /**
  * Matrix Algebra over an 8-bit Galois Field
- *
+ * <p>
  * Copyright 2015, Backblaze, Inc.
  */
 
@@ -34,7 +34,7 @@ public class Matrix {
      * Because this this is computer science, and not math,
      * the indices for both the row and column start at 0.
      */
-    private final byte [] [] data;
+    private final byte[][] data;
 
     /**
      * Initialize a matrix of zeros.
@@ -45,19 +45,19 @@ public class Matrix {
     public Matrix(int initRows, int initColumns) {
         rows = initRows;
         columns = initColumns;
-        data = new byte [rows] [];
+        data = new byte[rows][];
         for (int r = 0; r < rows; r++) {
-            data[r] = new byte [columns];
+            data[r] = new byte[columns];
         }
     }
 
     /**
      * Initializes a matrix with the given row-major data.
      */
-    public Matrix(byte [] [] initData) {
+    public Matrix(byte[][] initData) {
         rows = initData.length;
         columns = initData[0].length;
-        data = new byte [rows] [];
+        data = new byte[rows][];
         for (int r = 0; r < rows; r++) {
             if (initData[r].length != columns) {
                 throw new IllegalArgumentException("Not all rows have the same number of columns");
@@ -179,7 +179,7 @@ public class Matrix {
             return false;
         }
         for (int r = 0; r < rows; r++) {
-            if (!Arrays.equals(data[r], ((Matrix)other).data[r])) {
+            if (!Arrays.equals(data[r], ((Matrix) other).data[r])) {
                 return false;
             }
         }
@@ -193,8 +193,8 @@ public class Matrix {
     public Matrix times(Matrix right) {
         if (getColumns() != right.getRows()) {
             throw new IllegalArgumentException(
-                    "Columns on left (" + getColumns() +") " +
-                    "is different than rows on right (" + right.getRows() + ")");
+                    "Columns on left (" + getColumns() + ") " +
+                            "is different than rows on right (" + right.getRows() + ")");
         }
         Matrix result = new Matrix(getRows(), right.getColumns());
         for (int r = 0; r < getRows(); r++) {
@@ -244,8 +244,8 @@ public class Matrix {
     /**
      * Returns one row of the matrix as a byte array.
      */
-    public byte [] getRow(int row) {
-        byte [] result = new byte [columns];
+    public byte[] getRow(int row) {
+        byte[] result = new byte[columns];
         for (int c = 0; c < columns; c++) {
             result[c] = get(row, c);
         }
@@ -259,7 +259,7 @@ public class Matrix {
         if (r1 < 0 || rows <= r1 || r2 < 0 || rows <= r2) {
             throw new IllegalArgumentException("Row index out of range");
         }
-        byte [] tmp = data[r1];
+        byte[] tmp = data[r1];
         data[r1] = data[r2];
         data[r2] = tmp;
     }

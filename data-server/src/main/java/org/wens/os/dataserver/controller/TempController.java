@@ -37,11 +37,11 @@ public class TempController {
     private StorageInstanceService storageInstanceService;
 
     @Resource
-    private AcceptLocateRequestService acceptLocateRequestService ;
+    private AcceptLocateRequestService acceptLocateRequestService;
 
 
     @PutMapping("/{uuid}")
-    public ResponseEntity put(@PathVariable("uuid") String uuid , @RequestParam("name") String name) throws IOException {
+    public ResponseEntity put(@PathVariable("uuid") String uuid, @RequestParam("name") String name) throws IOException {
         try (InputStream inputStream = storageInstanceService.getTempStorageService().read(uuid)) {
             if (inputStream == null) {
                 log.warn("Can not read inputStream. [ uuid = {} ]", uuid);
@@ -49,7 +49,7 @@ public class TempController {
             }
 
             JSONObject jsonObject = JSONObject.parseObject(IOUtils.toString(inputStream, Charset.forName("utf-8")));
-            long actualSize = storageInstanceService.getTempStorageService().size( String.format("%s.bat",uuid ) );
+            long actualSize = storageInstanceService.getTempStorageService().size(String.format("%s.bat", uuid));
             if (jsonObject.getLong("size") != actualSize) {
                 log.warn("Size mismatch.[size = {} , actualSize = {} , uuid = {} ]", jsonObject.getLong("size"), actualSize, uuid);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -57,9 +57,9 @@ public class TempController {
 
             //commit
             MessageDigest messageDigest = MessageDisgestUtils.sha256();
-            try (InputStream inputStream2 = storageInstanceService.getTempStorageService().read(String.format("%s.bat",uuid ));
-                 OutputStream outputStream2 = new GZIPOutputStream( new CalDigestOutputStream( storageInstanceService.getObjectsStorageService().write(name), messageDigest ));
-                 OutputStream outputStream3 = storageInstanceService.getObjectsStorageService().write( String.format("%s.checksum",name ))
+            try (InputStream inputStream2 = storageInstanceService.getTempStorageService().read(String.format("%s.bat", uuid));
+                 OutputStream outputStream2 = new GZIPOutputStream(new CalDigestOutputStream(storageInstanceService.getObjectsStorageService().write(name), messageDigest));
+                 OutputStream outputStream3 = storageInstanceService.getObjectsStorageService().write(String.format("%s.checksum", name))
             ) {
                 IOUtils.copy(inputStream2, outputStream2);
                 //close buffer
@@ -69,7 +69,7 @@ public class TempController {
                 }
 
                 acceptLocateRequestService.addName(name);
-                storageInstanceService.getTempStorageService().remove(String.format("%s.bat",uuid ));
+                storageInstanceService.getTempStorageService().remove(String.format("%s.bat", uuid));
                 storageInstanceService.getTempStorageService().remove(uuid);
             }
         }
@@ -77,13 +77,13 @@ public class TempController {
     }
 
     @PostMapping()
-    public ResponseEntity post( HttpServletRequest request ) throws IOException {
+    public ResponseEntity post(HttpServletRequest request) throws IOException {
         String uuid = UUIDS.uuid();
         MessageDigest messageDigest = MessageDisgestUtils.sha256();
-        try (OutputStream outputStream = new CalDigestOutputStream(storageInstanceService.getTempStorageService().write(uuid + ".bat"),messageDigest)) {
-            long size  = IOUtils.copy(request.getInputStream(), outputStream);
+        try (OutputStream outputStream = new CalDigestOutputStream(storageInstanceService.getTempStorageService().write(uuid + ".bat"), messageDigest)) {
+            long size = IOUtils.copy(request.getInputStream(), outputStream);
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("checksum", String.format("sha256-%s" , Hex.encodeHexString( messageDigest.digest() )));
+            jsonObject.put("checksum", String.format("sha256-%s", Hex.encodeHexString(messageDigest.digest())));
             jsonObject.put("size", size);
             jsonObject.put("uuid", uuid);
             try (InputStream inputStream1 = new ByteArrayInputStream(jsonObject.toJSONString().getBytes(Charset.forName("utf-8")));

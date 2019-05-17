@@ -18,7 +18,7 @@ public class OKHttps {
 
     private final static Logger log = LoggerFactory.getLogger(OKHttps.class);
 
-    private final static OkHttpClient okHttpClient ;
+    private final static OkHttpClient okHttpClient;
 
     static {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor((message) -> log.info(message));

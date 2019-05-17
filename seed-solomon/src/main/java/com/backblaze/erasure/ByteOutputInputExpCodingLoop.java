@@ -1,6 +1,6 @@
 /**
  * One specific ordering/nesting of the coding loops.
- *
+ * <p>
  * Copyright 2015, Backblaze, Inc.  All rights reserved.
  */
 
@@ -17,7 +17,7 @@ public class ByteOutputInputExpCodingLoop extends CodingLoopBase {
 
         for (int iByte = offset; iByte < offset + byteCount; iByte++) {
             for (int iOutput = 0; iOutput < outputCount; iOutput++) {
-                byte [] matrixRow = matrixRows[iOutput];
+                byte[] matrixRow = matrixRows[iOutput];
                 int value = 0;
                 for (int iInput = 0; iInput < inputCount; iInput++) {
                     value ^= Galois.multiply(matrixRow[iInput], inputs[iInput][iByte]);

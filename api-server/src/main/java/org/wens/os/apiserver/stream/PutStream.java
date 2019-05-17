@@ -6,16 +6,13 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.BufferedSink;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wens.os.common.OSException;
 import org.wens.os.common.http.OKHttps;
-import org.wens.os.common.util.MessageDisgestUtils;
 
 import java.io.*;
-import java.security.MessageDigest;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -34,7 +31,6 @@ public class PutStream {
     private OutputStream outputStream;
 
     private Future<WriteResult> writeResultFuture;
-
 
 
     public PutStream(String server) {
@@ -73,14 +69,14 @@ public class PutStream {
         outputStream.write(b, off, len);
     }
 
-    public void write(InputStream inputStream)  throws IOException {
-        byte[] b = new byte[1024 * 4 ];
-        while (true){
-            int n = inputStream.read(b,0,b.length );
-            if(n == -1){
+    public void write(InputStream inputStream) throws IOException {
+        byte[] b = new byte[1024 * 4];
+        while (true) {
+            int n = inputStream.read(b, 0, b.length);
+            if (n == -1) {
                 break;
             }
-            write(b,0,n);
+            write(b, 0, n);
         }
     }
 
@@ -92,11 +88,11 @@ public class PutStream {
             throw new IllegalStateException("write result is null");
         }
 
-        try (Response response = OKHttps.put(String.format("http://%s/temp/%s", server, writeResult.uuid), new FormBody.Builder().add("name", name ).build())) {
+        try (Response response = OKHttps.put(String.format("http://%s/temp/%s", server, writeResult.uuid), new FormBody.Builder().add("name", name).build())) {
             if (response.code() != 200) {
-                return false ;
-            }else{
-                return true ;
+                return false;
+            } else {
+                return true;
             }
         }
     }
@@ -107,11 +103,11 @@ public class PutStream {
             throw new IllegalStateException("write result is null");
         }
 
-        try (Response response = OKHttps.delete(String.format("http://%s/temp/%s", server, writeResult.uuid ))) {
+        try (Response response = OKHttps.delete(String.format("http://%s/temp/%s", server, writeResult.uuid))) {
             if (response.code() != 200) {
-                return true ;
-            }else{
-                return false ;
+                return true;
+            } else {
+                return false;
             }
         }
     }

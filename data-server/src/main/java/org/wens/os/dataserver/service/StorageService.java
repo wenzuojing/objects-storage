@@ -11,12 +11,12 @@ import java.util.function.Predicate;
  */
 public interface StorageService {
 
-    class Key{
-        public final String key ;
+    class Key {
+        public final String key;
 
-        public final long size ;
+        public final long size;
 
-        public final long lastmodify ;
+        public final long lastmodify;
 
         public Key(String key, long size, long lastmodify) {
             this.key = key;

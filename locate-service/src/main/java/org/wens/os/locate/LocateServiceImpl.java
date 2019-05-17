@@ -2,13 +2,13 @@ package org.wens.os.locate;
 
 
 import com.alibaba.fastjson.JSONObject;
-import org.wens.os.common.queue.MessageQueue;
-import org.wens.os.common.queue.RedisMessageQueue;
+import org.wens.os.common.jgroups.JGroupsMessageQueue;
+import org.wens.os.common.jgroups.MessageListener;
 import org.wens.os.common.util.UUIDS;
-import redis.clients.jedis.JedisPool;
 
-import java.nio.charset.Charset;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -17,48 +17,42 @@ import java.util.concurrent.TimeUnit;
  */
 public class LocateServiceImpl implements LocateService {
 
-    private JedisPool jedisPool ;
+    private JGroupsMessageQueue jGroupsMessageQueue;
 
-    private MessageQueue messageQueue ;
 
-    public LocateServiceImpl(String locateTopic , JedisPool jedisPool){
-        this.jedisPool = jedisPool ;
-        this.messageQueue = new RedisMessageQueue(locateTopic,jedisPool );
+    public LocateServiceImpl(String locateTopic) {
+        this.jGroupsMessageQueue = new JGroupsMessageQueue(locateTopic);
     }
 
     @Override
-    public Map<String,String> locate(List<String> names,int expireSize) {
+    public Map<String, String> locate(List<String> names, int expireSize) {
 
-        assert expireSize >= 1 ;
+        assert expireSize >= 1;
 
-        String topic  = UUIDS.uuid();
-        MessageQueue tempMessageQueue = new RedisMessageQueue(topic ,jedisPool );
-        try{
-            tempMessageQueue.start();
-            Map<String,String> results = new HashMap<>();
-            CountDownLatch countDownLatch = new CountDownLatch(expireSize);
-            tempMessageQueue.addMessageListener((m)-> {
-                String result = new String(m);
-                String[] items = result.split(",");
-                if(!results.containsKey(items[0])){
-                    results.put(items[0],items[1]);
-                    countDownLatch.countDown();
-                }
-
-            } );
-            // send locate message
-            JSONObject message = new JSONObject();
-            message.put("replyTo" , topic );
-            message.put("names",names);
-            messageQueue.send(message.toJSONString().getBytes(Charset.forName("utf-8")));
-            try {
-                countDownLatch.await(2, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                //
+        String tag = UUIDS.uuid();
+        Map<String, String> results = new ConcurrentHashMap<>();
+        CountDownLatch countDownLatch = new CountDownLatch(expireSize);
+        MessageListener messageListener = (context) -> {
+            if (!tag.equals(context.getTag())) {
+                return;
             }
-            return results;
-        }finally {
-            tempMessageQueue.close();
+            String result = new String(context.getMessage());
+            String[] items = result.split(",");
+            if (!results.containsKey(items[0])) {
+                results.put(items[0], items[1]);
+                countDownLatch.countDown();
+            }
+
+        };
+
+        jGroupsMessageQueue.addMessageListener(messageListener);
+        // send locate message
+        jGroupsMessageQueue.send(JSONObject.toJSONBytes(names), tag);
+        try {
+            countDownLatch.await(2, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            //
         }
+        return results;
     }
 }
