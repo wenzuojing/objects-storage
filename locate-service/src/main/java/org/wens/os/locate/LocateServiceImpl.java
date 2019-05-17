@@ -8,8 +8,7 @@ import org.wens.os.common.util.UUIDS;
 import redis.clients.jedis.JedisPool;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -28,18 +27,23 @@ public class LocateServiceImpl implements LocateService {
     }
 
     @Override
-    public List<String> locate(List<String> names,int expireSize) {
+    public Map<String,String> locate(List<String> names,int expireSize) {
 
         assert expireSize >= 1 ;
 
         String topic  = UUIDS.uuid();
         MessageQueue tempMessageQueue = new RedisMessageQueue(topic ,jedisPool );
         tempMessageQueue.start();
-        List<String> servers = new ArrayList<>();
+        Map<String,String> results = new HashMap<>();
         CountDownLatch countDownLatch = new CountDownLatch(expireSize);
         tempMessageQueue.addMessageListener((m)-> {
-            servers.add(new String(m));
-            countDownLatch.countDown();
+            String result = new String(m);
+            String[] items = result.split(",");
+            if(!results.containsKey(items[0])){
+                results.put(items[0],items[1]);
+                countDownLatch.countDown();
+            }
+
         } );
         // send locate message
         JSONObject message = new JSONObject();
@@ -52,6 +56,6 @@ public class LocateServiceImpl implements LocateService {
             //
         }
         messageQueue.close();
-        return servers;
+        return results;
     }
 }

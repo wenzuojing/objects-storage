@@ -3,6 +3,7 @@ package org.wens.os.dataserver.service;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -58,6 +59,10 @@ public class LocalDiskStorageService implements StorageService {
     public List<Key> list(Predicate<Key> predicate) {
         List<Key> keys = new ArrayList<>();
         File file = new File(storageDir);
+
+        if(!file.exists()){
+            file.mkdirs();
+        }
 
         for(File f : file.listFiles()){
             keys.add(new Key(f.getName(),f.length(),f.lastModified()));

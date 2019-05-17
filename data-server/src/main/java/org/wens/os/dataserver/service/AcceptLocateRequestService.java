@@ -59,7 +59,7 @@ public class AcceptLocateRequestService implements CommandLineRunner {
                         if(tempMessageQueue == null ){
                             tempMessageQueue = new RedisMessageQueue(jsonObject.getString("replyTo"), jedisPool) ;
                         }
-                        tempMessageQueue.send(listenAddress.getBytes(Charset.forName("utf-8")));
+                        tempMessageQueue.send( (name + ","+ listenAddress).getBytes(Charset.forName("utf-8")));
                     }
                 }
                 if( tempMessageQueue != null ){

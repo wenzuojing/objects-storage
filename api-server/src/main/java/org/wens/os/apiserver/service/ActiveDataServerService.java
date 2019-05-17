@@ -3,6 +3,7 @@ package org.wens.os.apiserver.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.wens.os.common.OSException;
 import org.wens.os.common.queue.MessageListener;
 import org.wens.os.common.queue.MessageQueue;
 import org.wens.os.common.queue.RedisMessageQueue;
@@ -10,9 +11,7 @@ import redis.clients.jedis.JedisPool;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -76,6 +75,21 @@ public class ActiveDataServerService implements MessageListener {
             list.add(entry.getKey());
         }
         return list;
+    }
+
+    public List<String> random(int i) {
+        List<String> servers = getAllActiveDataServers();
+        if(servers.size() < i ){
+            throw new OSException("There is not enough server");
+        }
+        Random random = new Random(System.currentTimeMillis());
+        Set<Integer> indexS = new HashSet<>();
+        while (indexS.size() != i ){
+            indexS.add( random.nextInt(servers.size()) );
+        }
+        List<String> ret = new ArrayList<>(i);
+        indexS.forEach(index -> ret.add(servers.get(index)));
+        return ret;
     }
 
 }

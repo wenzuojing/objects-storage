@@ -1,5 +1,5 @@
 server:
-  port: 8888
+  port: 8000
   address: localhost
 
 spring:
@@ -13,4 +13,4 @@ spring:
     timeout: 10s
 
 storage:
-  root: /data/storage_root1
+  root: /data/storage_root0

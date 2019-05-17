@@ -13,6 +13,7 @@ import org.wens.os.common.io.CalDigestOutputStream;
 import org.wens.os.common.util.IO;
 import org.wens.os.common.util.MessageDisgestUtils;
 import org.wens.os.common.util.UUIDS;
+import org.wens.os.dataserver.service.AcceptLocateRequestService;
 import org.wens.os.dataserver.service.StorageInstanceService;
 
 import javax.annotation.Resource;
@@ -34,6 +35,9 @@ public class TempController {
 
     @Resource
     private StorageInstanceService storageInstanceService;
+
+    @Resource
+    private AcceptLocateRequestService acceptLocateRequestService ;
 
 
     @PutMapping("/{uuid}")
@@ -64,6 +68,7 @@ public class TempController {
                     IOUtils.copy(inputStream3, outputStream3);
                 }
 
+                acceptLocateRequestService.addName(name);
                 storageInstanceService.getTempStorageService().remove(String.format("%s.bat",uuid ));
                 storageInstanceService.getTempStorageService().remove(uuid);
             }

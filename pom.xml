@@ -8,6 +8,7 @@
         <module>data-server</module>
         <module>locate-service</module>
         <module>common</module>
+        <module>seed-solomon</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
