@@ -1,6 +1,7 @@
 package org.wens.os.apiserver.stream;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wens.os.apiserver.util.ReedSolomonUtils;
@@ -58,8 +59,9 @@ public class RSPutStream {
         long size = 0;
 
         while (true) {
-            int n = srcInputStream.read(block);
-            if (n == -1) {
+
+            int n = IOUtils.read(srcInputStream,block,0,block.length);
+            if (n == 0) {
                 break;
             }
             size += n;
@@ -74,6 +76,7 @@ public class RSPutStream {
             for (int i = 0; i < DATA_SHARDS + PARITY_SHARDS; i++) {
                 byte[] intBytes = new byte[4];
                 ByteBuffer.wrap(intBytes).putInt(shards[i].length);
+                System.err.println( i+ " " + shards[i].length);
                 putStreams.get(i).write(intBytes, 0, intBytes.length);
                 putStreams.get(i).write(shards[i], 0, shards[i].length);
             }

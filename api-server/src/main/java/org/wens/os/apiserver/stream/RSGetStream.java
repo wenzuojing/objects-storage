@@ -76,11 +76,13 @@ public class RSGetStream implements Closeable {
                             //read size
                             byte[] intBytes = new byte[4];
                             int r = getStreams[i].read(intBytes, 0, intBytes.length);
-                            if (r == -1) {
+                            if (r == 0) {
                                 finish = true;
                                 break;
                             }
-                            shards[i] = new byte[ByteBuffer.wrap(intBytes).getInt()];
+                            int len = ByteBuffer.wrap(intBytes).getInt() ;
+                            System.err.println(i +" "+ len);
+                            shards[i] = new byte[len];
                             getStreams[i].read(shards[i], 0, shards[i].length);
                         }
                     }

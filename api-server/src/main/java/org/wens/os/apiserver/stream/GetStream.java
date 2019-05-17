@@ -1,6 +1,7 @@
 package org.wens.os.apiserver.stream;
 
 import okhttp3.Response;
+import org.apache.commons.io.IOUtils;
 import org.wens.os.common.OSNotFoundException;
 import org.wens.os.common.http.OKHttps;
 
@@ -25,7 +26,7 @@ public class GetStream implements Closeable {
     }
 
     public int read(byte[] b, int off, int len) throws IOException {
-        return response.body().byteStream().read(b, off, len);
+        return IOUtils.read(response.body().byteStream(),b, off, len);
     }
 
     @Override

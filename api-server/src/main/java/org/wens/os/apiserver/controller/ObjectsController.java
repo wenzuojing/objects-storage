@@ -39,7 +39,8 @@ public class ObjectsController {
     public ResponseEntity get(@PathVariable("name") String name, HttpServletResponse response) throws IOException {
         try (RSGetStream rsGetStream = new RSGetStream(name, locateService)) {
             InputStream inputStream = rsGetStream.read();
-            IOUtils.copy(inputStream, response.getOutputStream());
+            int n = IOUtils.copy(inputStream, response.getOutputStream());
+            log.info("write {} byte",n );
         }
         return ResponseEntity.ok().build();
     }
