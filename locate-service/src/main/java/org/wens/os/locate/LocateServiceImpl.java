@@ -33,29 +33,32 @@ public class LocateServiceImpl implements LocateService {
 
         String topic  = UUIDS.uuid();
         MessageQueue tempMessageQueue = new RedisMessageQueue(topic ,jedisPool );
-        tempMessageQueue.start();
-        Map<String,String> results = new HashMap<>();
-        CountDownLatch countDownLatch = new CountDownLatch(expireSize);
-        tempMessageQueue.addMessageListener((m)-> {
-            String result = new String(m);
-            String[] items = result.split(",");
-            if(!results.containsKey(items[0])){
-                results.put(items[0],items[1]);
-                countDownLatch.countDown();
-            }
+        try{
+            tempMessageQueue.start();
+            Map<String,String> results = new HashMap<>();
+            CountDownLatch countDownLatch = new CountDownLatch(expireSize);
+            tempMessageQueue.addMessageListener((m)-> {
+                String result = new String(m);
+                String[] items = result.split(",");
+                if(!results.containsKey(items[0])){
+                    results.put(items[0],items[1]);
+                    countDownLatch.countDown();
+                }
 
-        } );
-        // send locate message
-        JSONObject message = new JSONObject();
-        message.put("replyTo" , topic );
-        message.put("names",names);
-        messageQueue.send(message.toJSONString().getBytes(Charset.forName("utf-8")));
-        try {
-            countDownLatch.await(2, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            //
+            } );
+            // send locate message
+            JSONObject message = new JSONObject();
+            message.put("replyTo" , topic );
+            message.put("names",names);
+            messageQueue.send(message.toJSONString().getBytes(Charset.forName("utf-8")));
+            try {
+                countDownLatch.await(2, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                //
+            }
+            return results;
+        }finally {
+            tempMessageQueue.close();
         }
-        messageQueue.close();
-        return results;
     }
 }

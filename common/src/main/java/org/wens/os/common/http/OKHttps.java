@@ -22,7 +22,7 @@ public class OKHttps {
 
     static {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor((message) -> log.info(message));
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
         okHttpClient = new OkHttpClient.Builder().addInterceptor(logging).connectTimeout(Duration.ofSeconds(6)).readTimeout(Duration.ofMinutes(5)).callTimeout(Duration.ofMinutes(5)).build();
     }
 

@@ -73,6 +73,7 @@ public class RedisMessageQueue extends BinaryJedisPubSub implements MessageQueue
                             log.error("subscribe message fail.", t);
                         }
                     }
+                    System.out.println("close");
                 }, String.format("subscribe-%s", new String(topic, Charset.forName("utf-8")))).start();
                 try {
                     countDownLatch.await();
