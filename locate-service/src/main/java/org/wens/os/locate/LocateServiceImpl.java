@@ -2,6 +2,8 @@ package org.wens.os.locate;
 
 
 import com.alibaba.fastjson.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wens.os.common.jgroups.JGroupsMessageQueue;
 import org.wens.os.common.jgroups.MessageListener;
 import org.wens.os.common.util.UUIDS;
@@ -16,6 +18,8 @@ import java.util.concurrent.TimeUnit;
  * @author wens
  */
 public class LocateServiceImpl implements LocateService {
+
+    private final Logger log  = LoggerFactory.getLogger(this.getClass());
 
     private JGroupsMessageQueue jGroupsMessageQueue;
 
@@ -49,10 +53,15 @@ public class LocateServiceImpl implements LocateService {
         // send locate message
         jGroupsMessageQueue.send(JSONObject.toJSONBytes(names), tag);
         try {
-            countDownLatch.await(2, TimeUnit.SECONDS);
+            countDownLatch.await(3, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             //
         }
+
+        if( results.size() < expireSize ){
+            log.warn("Expire {} but {} ",expireSize , results.size() );
+        }
+
         return results;
     }
 }

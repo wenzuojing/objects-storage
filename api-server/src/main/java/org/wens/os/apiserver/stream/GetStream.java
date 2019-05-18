@@ -17,11 +17,9 @@ public class GetStream implements Closeable {
 
     public GetStream(String server, String name) throws IOException {
         response = OKHttps.get(String.format("http://%s/objects/%s", server, name));
-        if (response.code() == 404) {
-            throw new OSNotFoundException("can not find stream");
-        }
         if (response.code() != 200) {
-            throw new IOException("read fail");
+            response.close();
+            throw new OSNotFoundException("read fail");
         }
     }
 

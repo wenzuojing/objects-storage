@@ -51,18 +51,29 @@ public class RSGetStream implements Closeable {
         Map<String, String> locateResults = locateService.locate(names, DATA_SHARDS);
 
         if (locateResults.size() < DATA_SHARDS) {
-            throw new OSNotFoundException("can not find object stream.");
+            throw new OSNotFoundException("Not enough shards present.");
         }
 
+        int getStreamCount = 0 ;
         for (int i = 0; i < (DATA_SHARDS + PARITY_SHARDS); i++) {
             String shardName = String.format("%s.%s", name, i);
             String server = locateResults.get(shardName);
 
             if (server != null) {
-                getStreams[i] = new GetStream(server, shardName);
+                try{
+                    getStreams[i] = new GetStream(server, shardName);
+                    getStreamCount++;
+                }catch (OSNotFoundException e){
+                    log.warn("No found shard {} ", shardName );
+                }
+
             }
         }
 
+
+        if (getStreamCount < DATA_SHARDS) {
+            throw new OSNotFoundException("Not enough shards present.");
+        }
         PipedOutputStream output = new PipedOutputStream();
         inputStream = new PipedInputStream(output);
 
