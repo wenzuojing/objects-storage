@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.wens.os.common.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.sql.ResultSet;
@@ -36,13 +37,13 @@ public class MetaDataServiceImpl implements MetaDataService {
     @Override
     public MetaData findLastVersion(String name) {
         String sql = "select * from meta_data where name = ? order by version desc limit 1";
-        return queryOne(name, sql);
+        return queryOne( sql,name);
     }
 
     @Override
     public MetaData find(String name, int version) {
         String sql = "select * from meta_data where name = ? and version = ? ";
-        return queryOne(name, sql);
+        return queryOne(sql,name,version);
     }
 
     @Override
@@ -54,7 +55,7 @@ public class MetaDataServiceImpl implements MetaDataService {
         }
         metaData.setProps(new JSONObject());
         metaData.setSize(0);
-        metaData.setChecksum("");
+        metaData.setChecksum(StringUtils.EMPTY);
         metaData.setVersion(metaData.getVersion() + 1 );
         save(metaData);
     }
@@ -71,8 +72,8 @@ public class MetaDataServiceImpl implements MetaDataService {
         return jdbcTemplate.query(sql,new MetaDataRowMapper(),name);
     }
 
-    private MetaData queryOne(String name, String sql) {
-        List<MetaData> list = jdbcTemplate.query(sql, new MetaDataRowMapper(), name);
+    private MetaData queryOne(String sql ,Object... args) {
+        List<MetaData> list = jdbcTemplate.query(sql, new MetaDataRowMapper(), args);
         if (list == null || list.isEmpty()) {
             return null;
         }

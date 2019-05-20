@@ -83,6 +83,8 @@ public class ObjectsController {
         if(metaData == null ){
             metaData = new MetaData();
             metaData.setVersion(1);
+        }else{
+            metaData.setVersion(metaData.getVersion()+1);
         }
         metaData.setName(name);
         metaData.setChecksum(checksum);
@@ -91,6 +93,13 @@ public class ObjectsController {
         metaDataService.save(metaData);
         return ResponseEntity.ok(metaData);
     }
+
+    @DeleteMapping(value = "/{name}")
+    public ResponseEntity delete(@PathVariable("name") String name) throws IOException {
+        metaDataService.delete(name);
+        return ResponseEntity.ok().build();
+    }
+
 
     private JSONObject resolveProps(HttpServletRequest request) {
         String str = request.getHeader("props");
