@@ -1,0 +1,20 @@
+
+---
+#development environment
+spring:
+  profiles: dev
+  datasource:
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.15.101:3306/objects-storage?useUnicode=true&characterEncoding=utf8
+
+---
+#production environment
+spring:
+  profiles: prod
+  datasource:
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.15.101:3306/objects-storage?useUnicode=true&characterEncoding=utf8

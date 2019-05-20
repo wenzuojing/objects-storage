@@ -23,25 +23,9 @@ import static org.wens.os.apiserver.stream.RSConfig.*;
  */
 public class RSPutStream {
 
-    public static class WriteResult {
-
-        public final String checksum;
-
-        public final long size;
-
-
-        public WriteResult(String checksum, long size) {
-            this.checksum = checksum;
-            this.size = size;
-        }
-    }
-
-
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private List<PutStream> putStreams;
-
-    private WriteResult writeResult;
 
     public RSPutStream(List<String> servers) {
         if (servers.size() != DATA_SHARDS + PARITY_SHARDS) {
@@ -50,9 +34,7 @@ public class RSPutStream {
         this.putStreams = servers.stream().map(s -> new PutStream(s)).collect(Collectors.toList());
     }
 
-    public WriteResult write(InputStream srcInputStream) throws IOException {
-        MessageDigest messageDigest = MessageDisgestUtils.sha256();
-        srcInputStream = new CalDigestInputStream(srcInputStream, messageDigest);
+    public long write(InputStream srcInputStream) throws IOException {
 
         byte[] block = new byte[BLOCK_SIZE];
 
@@ -76,21 +58,15 @@ public class RSPutStream {
             for (int i = 0; i < DATA_SHARDS + PARITY_SHARDS; i++) {
                 byte[] intBytes = new byte[4];
                 ByteBuffer.wrap(intBytes).putInt(shards[i].length);
-                System.err.println( i+ " " + shards[i].length);
                 putStreams.get(i).write(intBytes, 0, intBytes.length);
                 putStreams.get(i).write(shards[i], 0, shards[i].length);
             }
         }
-        writeResult = new WriteResult(String.format("sha256-%s", Hex.encodeHexString(messageDigest.digest())), size);
-        return writeResult;
+        return size;
     }
 
 
-    public boolean commit() throws IOException {
-        if (writeResult == null) {
-            throw new IllegalStateException("write result is null");
-        }
-        String name = writeResult.checksum.split("-")[1];
+    public boolean commit(String name) throws IOException {
         boolean allSuccess = true;
         for (int i = 0; i < putStreams.size(); i++) {
             boolean b = putStreams.get(i).commit(String.format("%s.%s", name, i));
@@ -104,10 +80,6 @@ public class RSPutStream {
     }
 
     public boolean rollback() throws IOException {
-        if (writeResult == null) {
-            throw new IllegalStateException("write result is null");
-        }
-
         boolean allSuccess = true;
         for (int i = 0; i < putStreams.size(); i++) {
             boolean b = putStreams.get(i).rollback();

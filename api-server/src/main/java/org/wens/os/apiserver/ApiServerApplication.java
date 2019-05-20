@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.wens.os.locate.LocateService;
 import org.wens.os.locate.LocateServiceImpl;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "org.wens.os")
 public class ApiServerApplication {
 
     public static void main(String[] args) {
