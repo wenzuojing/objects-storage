@@ -43,6 +43,7 @@ public class RSPutStream {
         while (true) {
 
             int n = IOUtils.read(srcInputStream,block,0,block.length);
+            // read end if n == 0
             if (n == 0) {
                 break;
             }
